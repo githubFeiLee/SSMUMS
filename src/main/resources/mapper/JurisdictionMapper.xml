@@ -1,0 +1,77 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "D://mybatis/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qingshixun.asl.module.jurisdiction.dao.JurisdictionDaoMyBatis">
+	<!-- 配置二级缓存 -->
+	<cache eviction="FIFO" flushInterval="300000" size="512" readOnly="true"/>
+<!-- 获取权限列表 -->
+	<select id="getJurisdictions" resultType="JurisdictionDTO">
+		SELECT
+			de.id,
+			de.name,
+			de.description,
+			de.createTime
+		FROM
+			al_jurisdiction de order by id desc
+	</select>
+	<!-- 根据角色id获取角色权限关联 -->
+	<select id="getRoleJurisdictions" resultType="JurisdictionDTO">
+		SELECT
+			de.id,
+			de.name
+		FROM
+			al_jurisdiction de,
+			al_role_jurisdiction rj
+		WHERE
+			de.id = rj.jurisdiction_id AND
+			rj.role_id = #{roleId}
+	</select>
+	
+	<!-- 根据id或取权限 -->
+	<select id="getJurisdiction" resultType="JurisdictionDTO" flushCache="true">
+		SELECT
+			de.id,
+			de.name,
+			de.description
+		FROM
+			al_jurisdiction de
+		WHERE
+			de.id = #{id}
+	</select>
+	<!-- 保存权限 -->
+	<insert id="saveOrUpdateJurisdiction">
+		INSERT INTO al_jurisdiction (
+			id,
+			name,
+			description
+		) VALUES (
+			#{id},
+			#{name},
+			#{description}
+		)
+		ON DUPLICATE KEY UPDATE
+			name = #{name},
+			description = #{description}
+	</insert>
+	<!-- 根据id删除权限 -->
+	<delete id="removeJurisdiction">
+		DELETE FROM
+				al_jurisdiction
+		WHERE
+				id=#{jurisdictionId}
+	</delete>
+	<!-- 根据id删除多个权限 -->
+	<delete id="removeJurisdictions">
+		DELETE FROM
+				al_jurisdiction
+		WHERE
+				id IN (${jurisdictionIds})
+	</delete>
+	<!-- 获取权限基本信息列表 -->
+ 	<select id="getSimpleJurisdictions" resultType="JurisdictionDTO">
+ 		SELECT
+ 			de.id,
+ 			de.name
+ 		FROM
+ 			al_jurisdiction de
+ 	</select>
+</mapper>
